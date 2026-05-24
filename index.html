@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎾 TennisVerein+ App</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; }
+    button { cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <script type="text/babel">
+    const { useState } = React;
+
+    function TennisApp() {
+      const [screen, setScreen] = useState('login');
+      const [userRole, setUserRole] = useState(null);
+      const [menuOpen, setMenuOpen] = useState(false);
+      const [bookings, setBookings] = useState([
+        { id: 1, court: 'Court 1', time: '10:00-11:00', player: 'Max M.', status: 'confirmed' },
+        { id: 2, court: 'Court 2', time: '14:00-15:00', player: 'Lisa K.', status: 'confirmed' }
+      ]);
+
+      const handleLogin = (role) => {
+        setUserRole(role);
+        setScreen('dashboard');
+      };
+
+      const handleLogout = () => {
+        setUserRole(null);
+        setScreen('login');
+        setMenuOpen(false);
+      };
+
+      if (screen === 'login') {
+        return (
+          <div style={{ background: 'linear-gradient(135deg, #0F6E56 0%, #1D9E75 100%)', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+            <div style={{ background: 'white', borderRadius: '12px', padding: '2rem', maxWidth: '400px', width: '100%', textAlign: 'center' }}>
+              <div style={{ fontSize: '48px', marginBottom: '1.5rem' }}>🎾</div>
+              <h1 style={{ fontSize: '28px', fontWeight: '500', marginBottom: '0.5rem', color: '#1D9E75' }}>TennisVerein+</h1>
+              <p style={{ color: '#888', marginBottom: '2rem', fontSize: '14px' }}>Vereinsverwaltung leicht gemacht</p>
+              
+              <button onClick={() => handleLogin('member')} style={{ width: '100%', padding: '12px', background: '#1D9E75', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '500', fontSize: '15px', marginBottom: '12px' }}>
+                Anmelden als Mitglied
+              </button>
+              <button onClick={() => handleLogin('trainer')} style={{ width: '100%', padding: '12px', background: '#534AB7', color: 'white', border: 'none', borderRadius: '8px', fontWeight: '500', fontSize: '15px' }}>
+                Anmelden als Trainer/Admin
+              </button>
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div style={{ background: '#f5f5f5', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+          <header style={{ background: 'white', borderBottom: '1px solid #ddd', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, zIndex: 100 }}>
+            <h1 style={{ fontSize: '18px', fontWeight: '500', margin: 0, color: '#1D9E75' }}>🎾 TennisVerein+</h1>
+            <button onClick={() => setMenuOpen(!menuOpen)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px', padding: '8px' }}>
+              {menuOpen ? '✕' : '☰'}
+            </button>
+          </header>
+
+          {menuOpen && (
+            <div style={{ background: 'white', borderBottom: '1px solid #ddd', padding: '1rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <button onClick={() => { setScreen('dashboard'); setMenuOpen(false); }} style={{ padding: '12px', textAlign: 'left', background: screen === 'dashboard' ? '#E6F1FB' : 'transparent', border: '1px solid #ddd', borderRadius: '8px', cursor: 'pointer', fontSize: '15px' }}>
+                📊 Dashboard
+              </button>
+              <button onClick={() => { setScreen('bookings'); setMenuOpen(false); }} style={{ padding: '12px', textAlign: 'left', background: screen === 'bookings' ? '#E6F1FB' : 'transparent', border: '1px solid #ddd', borderRadius: '8px', cursor: 'pointer', fontSize: '15px' }}>
+                📅 Buchungen
+              </button>
+              <button onClick={() => { setScreen('tournaments'); setMenuOpen(false); }} style={{ padding: '12px', textAlign: 'left', background: screen === 'tournaments' ? '#E6F1FB' : 'transparent', border: '1px solid #ddd', borderRadius: '8px', cursor: 'pointer', fontSize: '15px' }}>
+                🏆 Turniere
+              </button>
+              {userRole === 'trainer' && (
+                <button onClick={() => { setScreen('members'); setMenuOpen(false); }} style={{ padding: '12px', textAlign: 'left', background: screen === 'members' ? '#E6F1FB' : 'transparent', border: '1px solid #ddd', borderRadius: '8px', cursor: 'pointer', fontSize: '15px' }}>
+                  👥 Mitglieder
+                </button>
+              )}
+              <hr style={{ border: '1px solid #ddd', margin: '8px 0' }} />
+              <div style={{ fontSize: '13px', color: '#888', padding: '0 12px' }}>Angemeldet als: {userRole === 'trainer' ? 'Trainer/Admin' : 'Mitglied'}</div>
+              <button onClick={handleLogout} style={{ padding: '12px', background: '#FCE8E8', color: '#A32D2D', border: '1px solid #F0BCBC', borderRadius: '8px', cursor: 'pointer', fontSize: '15px', fontWeight: '500', marginTop: '8px' }}>
+                Abmelden
+              </button>
+            </div>
+          )}
+
+          <div style={{ flex: 1, padding: '1rem' }}>
+            {screen === 'dashboard' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #ddd', padding: '1.25rem' }}>
+                  <h2 style={{ fontSize: '22px', fontWeight: '500', margin: '0 0 8px 0' }}>Hallo {userRole === 'trainer' ? 'Trainer' : 'Spieler'}! 👋</h2>
+                  <p style={{ fontSize: '14px', color: '#888', margin: 0 }}>Sonntag, 24. Mai 2026</p>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+                  <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #ddd', padding: '1rem', cursor: 'pointer' }} onClick={() => setScreen('bookings')}>
+                    <div style={{ fontSize: '24px', marginBottom: '8px' }}>📅</div>
+                    <div style={{ fontSize: '13px', color: '#888' }}>Buchungen</div>
+                    <div style={{ fontSize: '18px', fontWeight: '500' }}>{bookings.length}</div>
+                  </div>
+                  
+                  <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #ddd', padding: '1rem', cursor: 'pointer' }} onClick={() => setScreen('tournaments')}>
+                    <div style={{ fontSize: '24px', marginBottom: '8px' }}>🏆</div>
+                    <div style={{ fontSize: '13px', color: '#888' }}>Turniere</div>
+                    <div style={{ fontSize: '18px', fontWeight: '500' }}>3</div>
+                  </div>
+                </div>
+
+                <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #ddd', padding: '1.25rem' }}>
+                  <h3 style={{ fontSize: '16px', fontWeight: '500', margin: '0 0 12px 0' }}>Nächste Buchungen</h3>
+                  {bookings.map(booking => (
+                    <div key={booking.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #ddd' }}>
+                      <div>
+                        <div style={{ fontWeight: '500', fontSize: '14px' }}>{booking.court}</div>
+                        <div style={{ fontSize: '13px', color: '#888' }}>{booking.time}</div>
+                      </div>
+                      <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#639922' }}></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {screen === 'bookings' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #ddd', padding: '1.25rem' }}>
+                  <h2 style={{ fontSize: '20px', fontWeight: '500', margin: '0 0 12px 0' }}>Court-Buchungen</h2>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', marginBottom: '16px' }}>
+                    {['Court 1', 'Court 2', 'Court 3', 'Court 4'].map((court, idx) => (
+                      <div key={idx} style={{ background: '#f9f9f9', border: '1px solid #ddd', borderRadius: '8px', padding: '12px' }}>
+                        <div style={{ fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>{court}</div>
+                        <select style={{ width: '100%', padding: '8px', fontSize: '12px', border: '1px solid #ddd', borderRadius: '8px' }}>
+                          <option>Zeit wählen</option>
+                          <option>08:00-09:00</option>
+                          <option>10:00-11:00</option>
+                          <option>14:00-15:00</option>
+                        </select>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #ddd', padding: '1.25rem' }}>
+                  <h3 style={{ fontSize: '16px', fontWeight: '500', margin: '0 0 12px 0' }}>Deine Buchungen</h3>
+                  {bookings.map(booking => (
+                    <div key={booking.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #ddd' }}>
+                      <div>
+                        <div style={{ fontWeight: '500', fontSize: '14px' }}>{booking.court} • {booking.time}</div>
+                        <div style={{ fontSize: '13px', color: '#888' }}>{booking.player}</div>
+                      </div>
+                      <div style={{ background: '#EAF3DE', color: '#3B6D11', padding: '4px 8px', borderRadius: '8px', fontSize: '12px', fontWeight: '500' }}>✓ Bestätigt</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {screen === 'tournaments' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <h2 style={{ fontSize: '20px', fontWeight: '500', margin: 0 }}>Turniere & Events</h2>
+                
+                {[
+                  { name: 'Sommer-Cup 2026', date: '15. Juni - 30. Juni', participants: 24 },
+                  { name: 'Vereinsmeisterschaften', date: '20. Juli', participants: 16 },
+                  { name: 'Freundschaftsspiel', date: '10. Juni', participants: 12 }
+                ].map((tournament, idx) => (
+                  <div key={idx} style={{ background: 'white', borderRadius: '12px', border: '1px solid #ddd', padding: '1.25rem' }}>
+                    <h3 style={{ fontSize: '15px', fontWeight: '500', margin: '0 0 8px 0' }}>🏆 {tournament.name}</h3>
+                    <div style={{ fontSize: '13px', color: '#888', marginBottom: '12px' }}>
+                      📅 {tournament.date} • 👥 {tournament.participants} Teilnehmer
+                    </div>
+                    <div style={{ background: '#E6F1FB', color: '#185FA5', padding: '8px 12px', borderRadius: '8px', fontSize: '12px', fontWeight: '500', textAlign: 'center' }}>
+                      Anmeldung läuft
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {screen === 'members' && userRole === 'trainer' && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <h2 style={{ fontSize: '20px', fontWeight: '500', margin: 0 }}>Mitgliederverwaltung</h2>
+                
+                <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #ddd', padding: '1.25rem' }}>
+                  {['Max Müller', 'Lisa König', 'Thomas Bauer'].map((member, idx) => (
+                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: idx < 2 ? '1px solid #ddd' : 'none' }}>
+                      <div>
+                        <div style={{ fontWeight: '500', fontSize: '14px' }}>{member}</div>
+                        <div style={{ fontSize: '13px', color: '#888' }}>Mitglied seit 2023</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<TennisApp />);
+  </script>
+</body>
+</html>
